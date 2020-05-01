@@ -31,7 +31,7 @@ int	basewidth, baseheight;
 
 byte	*vid_buffer[2];
 short	*zbuffer;
-byte	surfcache[512*1024];
+byte	surfcache[1024*1536];
 u16 	*left_fb, *right_fb;
 float separation_distance;
 

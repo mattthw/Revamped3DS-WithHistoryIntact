@@ -8,7 +8,7 @@ of the License, or (at your option) any later version.
 
 This program is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 See the GNU General Public License for more details.
 
@@ -63,14 +63,14 @@ void Chase_Update (void)
 	float	dist;
 	vec3_t	forward, up, right;
 	vec3_t	dest, stop;
-
+/*
 
 	// if can't see player, reset
 	AngleVectors (cl.viewangles, forward, right, up);
 
 	// calc exact destination
 	for (i=0 ; i<3 ; i++)
-		chase_dest[i] = r_refdef.vieworg[i] 
+		chase_dest[i] = r_refdef.vieworg[i]
 		- forward[i]*chase_back.value
 		- right[i]*chase_right.value;
 	chase_dest[2] = r_refdef.vieworg[2] + chase_up.value;
@@ -88,5 +88,6 @@ void Chase_Update (void)
 
 	// move towards destination
 	VectorCopy (chase_dest, r_refdef.vieworg);
+	*/
 }
 

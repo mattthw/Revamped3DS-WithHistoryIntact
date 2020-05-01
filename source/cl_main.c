@@ -717,7 +717,7 @@ CL_Init
 */
 void CL_Init (void)
 {
-	SZ_Alloc (&cls.message, 1024);
+	SZ_Alloc (&cls.message, 4096);
 
 	CL_InitInput ();
 	CL_InitTEnts ();

@@ -23,7 +23,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #define	QUAKE_GAME			// as opposed to utilities
 
-#define	VERSION				1.09
+#define	VERSION				1.11
 #define	GLQUAKE_VERSION		1.00
 #define	D3DQUAKE_VERSION	0.01
 #define	WINQUAKE_VERSION	0.996
@@ -33,9 +33,9 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //define	PARANOID			// speed sapping error checking
 
 #ifdef QUAKE2
-#define	GAMENAME	"id1"		// directory to look in by default
+#define	GAMENAME	"Rev"		// directory to look in by default
 #else
-#define	GAMENAME	"id1"
+#define	GAMENAME	"Rev"
 #endif
 
 #include <math.h>
@@ -143,6 +143,7 @@ void	VID_UnlockBuffer (void);
 #define	IT_ROCKET_LAUNCHER		32
 #define	IT_LIGHTNING			64
 #define IT_SUPER_LIGHTNING      128
+#define	IT_EXTRA_WEAPON			128
 #define IT_SHELLS               256
 #define IT_NAILS                512
 #define IT_ROCKETS              1024

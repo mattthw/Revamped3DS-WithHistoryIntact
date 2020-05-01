@@ -45,6 +45,8 @@ qpic_t		*scr_ram;
 qpic_t		*scr_net;
 qpic_t		*scr_turtle;
 
+qpic_t		*loading;
+
 int			scr_fullupdate;
 
 int			clearconsole;
@@ -332,6 +334,7 @@ void SCR_Init (void)
 	scr_ram = Draw_PicFromWad ("ram");
 	scr_net = Draw_PicFromWad ("net");
 	scr_turtle = Draw_PicFromWad ("turtle");
+	loading = Draw_CachePic("gfx/loading.lmp");
 
 	scr_initialized = true;
 }
@@ -351,7 +354,7 @@ void SCR_DrawRam (void)
 	if (!r_cache_thrash)
 		return;
 
-	Draw_Pic (scr_vrect.x+32, scr_vrect.y, scr_ram);
+	Draw_TransPic (scr_vrect.x+32, scr_vrect.y, scr_ram);
 }
 
 /*
@@ -674,6 +677,7 @@ void SCR_BeginLoadingPlaque (void)
 	scr_centertime_off = 0;
 	scr_con_current = 0;
 
+	Draw_Pic(0,0,loading);
 	scr_drawloading = true;
 	scr_fullupdate = 0;
 	Sbar_Changed ();
@@ -794,7 +798,7 @@ void SCR_BringDownConsole (void)
 }
 
 void SCR_DrawScreen (void) {
-	
+
 	if (scr_drawdialog)
 	{
 		Sbar_Draw ();
@@ -865,7 +869,10 @@ void SCR_UpdateScreen (void)
 			Con_Printf ("load failed.\n");
 		}
 		else
+		{
+			Draw_Pic(0,0, loading);
 			return;
+		}
 	}
 
 	if (cls.state == ca_dedicated)

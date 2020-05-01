@@ -26,16 +26,20 @@ include $(DEVKITARM)/3ds_rules
 #     - icon.png
 #     - <libctru folder>/default_icon.png
 #---------------------------------------------------------------------------------
-TARGET		:=	ctrQuake
+TARGET		:=	Revamped
 BUILD		:=	build
 SOURCES		:=	source
-APP_AUTHOR := MasterFeizz
-APP_TITLE := ctrQuake
-APP_DESCRIPTION := Port of Quake
+APP_AUTHOR := MasterFeizz-Flaming Ice-TCPixel
+APP_TITLE := Halo Revamped
+APP_DESCRIPTION := Halo Style Quake Mod
 
+#NO_SMDH		:=	nope
 DATA		:=	data
 INCLUDES	:=	include
 
+VERSION_MAJOR := 1
+VERSION_MINOR := 1
+VERSION_MICRO := 1
 #---------------------------------------------------------------------------------
 # options for code generation
 #---------------------------------------------------------------------------------
@@ -203,13 +207,17 @@ all: $(BUILD)
 
 $(BUILD):
 	@[ -d $@ ] || mkdir -p $@
+	@echo "#define GITVERSION \"$(shell git rev-parse --short HEAD)\"" > $(SOURCES)/gitversion.h 
 	@$(MAKE) --no-print-directory -C $(BUILD) -f $(CURDIR)/Makefile
 
 #---------------------------------------------------------------------------------
 clean:
 	@echo clean ...
-	@rm -fr $(BUILD) $(TARGET).3dsx $(OUTPUT).smdh $(TARGET).elf
+	@rm -fr $(BUILD) $(TARGET).3dsx $(OUTPUT).smdh $(TARGET).elf $(TARGET).cia $(SOURCES)/gitversion.h
 
+#---------------------------------------------------------------------------------
+run: $(BUILD)
+	@citra $(TARGET).elf > /dev/null 2>&1 || :
 
 #---------------------------------------------------------------------------------
 else
@@ -219,12 +227,24 @@ DEPENDS	:=	$(OFILES:.o=.d)
 #---------------------------------------------------------------------------------
 # main targets
 #---------------------------------------------------------------------------------
+all: $(OUTPUT).3dsx $(OUTPUT).cia
+
 ifeq ($(strip $(NO_SMDH)),)
 $(OUTPUT).3dsx	:	$(OUTPUT).elf $(OUTPUT).smdh
 else
 $(OUTPUT).3dsx	:	$(OUTPUT).elf
 endif
 $(OUTPUT).elf	:	$(OFILES)
+
+$(OUTPUT).cia   :   $(OUTPUT).elf $(OUTPUT).smdh 
+		@makerom	-f cia -o $@ -elf $(OUTPUT).elf \
+						-rsf $(TOPDIR)/cia.rsf \
+						-banner $(TOPDIR)/banner.bin \
+						-icon $(TOPDIR)/$(TARGET).smdh \
+						-logo $(TOPDIR)/logo.bcma.lz \
+						-ver "$$(($(VERSION_MAJOR)*1024+$(VERSION_MINOR)*16+$(VERSION_MICRO)))" \
+						-exefslogo -target t
+		@echo "built ... $(notdir $@)"
 
 #---------------------------------------------------------------------------------
 # you need a rule like this for each extension you use as binary data

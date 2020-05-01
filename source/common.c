@@ -435,8 +435,8 @@ float MSG_ReadAngle (void)
 
 void SZ_Alloc (sizebuf_t *buf, int startsize)
 {
-	if (startsize < 256)
-		startsize = 256;
+	if (startsize < 512)
+		startsize = 512;
 	buf->data = Hunk_AllocName (startsize, "sizebuf");
 	buf->maxsize = startsize;
 	buf->cursize = 0;
@@ -472,7 +472,7 @@ void *SZ_GetSpace (sizebuf_t *buf, int length)
 		Con_Printf ("SZ_GetSpace: overflow");
 		SZ_Clear (buf);
 	}
-
+	\
 	data = buf->data + buf->cursize;
 	buf->cursize += length;
 
@@ -1482,6 +1482,11 @@ void COM_InitFilesystem (void)
 		COM_AddGameDirectory (va("%s/rogue", basedir) );
 	if (COM_CheckParm ("-hipnotic"))
 		COM_AddGameDirectory (va("%s/hipnotic", basedir) );
+
+	if (COM_CheckParm ("-minmemory"))
+	{
+
+	}
 
 //
 // -game <gamedir>

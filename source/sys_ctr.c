@@ -24,6 +24,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include <3ds.h>
 #include <dirent.h>
+#include <time.h>
 #include "ctr.h"
 #include "touch_ctr.h"
 
@@ -268,7 +269,7 @@ void CTR_SetKeys(u32 keys, u32 state){
 void Sys_SendKeyEvents (void)
 {
 	hidScanInput();
-	
+
 	u32 kDown = hidKeysDown();
 
 	u32 kUp = hidKeysUp();
@@ -317,6 +318,7 @@ void Sys_DefaultConfig(void)
 	Cbuf_AddText ("lookstrafe \"1.000000\"\n");
 	Cbuf_AddText ("lookspring \"0.000000\"\n");
 	Cbuf_AddText ("gamma \"0.700000\"\n");
+	Cbuf_AddText ("threedimensions \"1\"\n");
 
 }
 
@@ -330,8 +332,6 @@ void Sys_Init(void)
 
 int main (int argc, char **argv)
 {
-	float		time, oldtime;
-
 	APT_CheckNew3DS(&isN3DS);
 	if(isN3DS)
 		osSetSpeedupEnable(true);
@@ -339,18 +339,54 @@ int main (int argc, char **argv)
 	gfxInit(GSP_RGB565_OES,GSP_RGB565_OES,false);
 	gfxSetDoubleBuffering(GFX_TOP, false);
 	gfxSetDoubleBuffering(GFX_BOTTOM, false);
-	gfxSet3D(true);
+	gfxSet3D(true); 
 	consoleInit(GFX_BOTTOM, NULL);
+	acInit();
 
 	#ifdef _3DS_CIA
-		if(chdir("sdmc:/3ds/ctrQuake") != 0)
-			Sys_Error("Could not find folder: sdmc:/3ds/ctrQuake");
+		if(chdir("sdmc:/3ds/Revamped") != 0)
+			Sys_Error("Could not find folder: sdmc:/3ds/Revamped");
 	#endif
 
 	static quakeparms_t    parms;
 
-	parms.memsize = 24*1024*1024;
-	parms.membase = malloc (parms.memsize);
+	u64 id;
+	APT_GetProgramID(&id);
+	if(isN3DS && id == 0x000400000371eb00) {
+		parms.membase = malloc(87*1024*1024);
+		parms.memsize = 87*1024*1024;
+	} else if (isN3DS) {
+		parms.membase = malloc(48*1024*1024);
+		parms.memsize = 48*1024*1024;
+	} else if (id == 0x000400000371eb00) {
+		parms.membase = malloc(43*1024*1024);
+		parms.memsize = 43*1024*1024;
+		u32 status = 0;
+		printf("Waiting for network...\nPress any button to skip...\n");
+		gfxFlushBuffers();
+  	 	gfxSwapBuffers();
+		while (status == 0) {
+			ACU_GetWifiStatus(&status);
+			hidScanInput();
+			if (hidKeysDown()) {
+				break;
+			}
+		}
+	} else {
+		printf("Running in low memory mode\nIf possible, use the CIA\nPress any button to continue\n");
+ 	 	gfxFlushBuffers();
+  	 	gfxSwapBuffers();
+		/*Yeah, this is most likely the wrong way to do this, but whatever*/
+		while (1) {
+			hidScanInput();
+			if (hidKeysDown()) {
+				break;
+			}
+		}
+		parms.membase = malloc(27*1024*1024);
+		parms.memsize = 27*1024*1024;
+	}
+
 	parms.basedir = ".";
 
 	COM_InitArgv (argc, argv);
@@ -358,17 +394,21 @@ int main (int argc, char **argv)
 	parms.argc = com_argc;
 	parms.argv = com_argv;
 	Host_Init (&parms);
-	
+
 	Sys_Init();
+	
+	float		time, oldtime;
 
 	oldtime = Sys_FloatTime() -0.1;
 	while (aptMainLoop())
 	{
+		if (threedimensions.value == 0) {separation_distance = 0;}
+		else {separation_distance = osGet3DSliderState();}
 		time = Sys_FloatTime();
-		separation_distance = osGet3DSliderState();
 		Host_Frame (time - oldtime);
 		oldtime = time;
 	}
+	acExit();
 	gfxExit();
 	return 0;
 }
